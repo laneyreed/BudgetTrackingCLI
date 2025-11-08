@@ -1,15 +1,13 @@
 # Budget Tracker CLI - Features 
 
 ### Main CLI Application(`ui/cli.py`)
-A fully functional command-line interface with:
 - User management (create/select users)
 - Account management (create/view accounts)
 - Transaction tracking (add/view transactions)
 - Financial summaries and reports
 - Beautiful rich-formatted interface with colors and tables
 
-### Application Launcher(`run_cli.py`)
-A simple launcher script that:
+### Application Runner(`run_cli.py`)
 - Handles Python import paths automatically
 - Makes running the app easy
 - Avoids module import errors\
