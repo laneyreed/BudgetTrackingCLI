@@ -20,3 +20,4 @@ def initialize_categories():
     for cat_name in DEFAULT_INCOME_CATEGORIES:
         categories.append(Category(id=category_id, name=cat_name, description=f"Income: {cat_name}"))
         category_id += 1
+    return categories

@@ -10,10 +10,10 @@ from ui.categories import initialize_categories
 
 def main():
     """Main entry point for the CLI application."""
-    initialize_categories()
+    categories =initialize_categories()
     
     try:
-        main_menu()
+        main_menu(categories)
     except KeyboardInterrupt:
         keyboardInterruptMessage
     except Exception as e:

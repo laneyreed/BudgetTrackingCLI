@@ -6,6 +6,11 @@ from rich.prompt import Prompt
 from rich.panel import Panel
 from rich.theme import Theme
 
+
+from ui.users import user_management_menu, current_user
+from ui.accounts import manage_accounts_menu, view_accounts
+from ui.transactions import add_transaction, view_transactions, view_summary
+
 #===============================================================
 # UI Color Theme 
 #===============================================================
@@ -72,7 +77,7 @@ def createMenu():
     menu_table.add_column("Description", style=MENU_DESCRIPTION_COLOR)
     return menu_table
 
-current_user = None
+
 
 
 def show_header(console):
@@ -86,10 +91,15 @@ def show_header(console):
 #===========================================================================
 
 
-#=============================================
+#==========================================================================
 # Main Menu Function
-def main_menu():
+#==========================================================================
+def main_menu(categories):
     """Display the main menu and handle user input."""
+
+    current_user = None
+
+
     while True:
         show_header(console)
         
@@ -99,7 +109,7 @@ def main_menu():
             loggedOut(menu)
         else:
             loggedIn(menu)
-        
+
         console.print(Panel(menu, title="[bold]Main Menu[/bold]", border_style="yellow"))
 
         choice = Prompt.ask(
@@ -110,19 +120,21 @@ def main_menu():
             console=console
         )
 
-        # if choice == "0":
-        #     console.print("\n[green]Thank you for using Budget Tracker! Goodbye! 👋[/green]")
-        #     break
-        # elif choice == "1":
-        #     if current_user:
-        #         manage_accounts_menu()
-        #     else:
-        #         user_management_menu()
-        # elif choice == "2" and current_user:
-        #     add_transaction()
-        # elif choice == "3" and current_user:
-        #     view_transactions()
-        # elif choice == "4" and current_user:
-        #     view_summary()
-        # elif choice == "5" and current_user:
-        #     user_management_menu()
+        if choice == "0":
+            console.print("\n[green]Thank you for using Budget Tracker! Goodbye! 👋[/green]")
+            break
+        elif choice == "1":
+            if current_user:
+                manage_accounts_menu(show_header, console, current_user)
+            else:
+                current_user = user_management_menu(show_header, console)
+        elif choice == "2" and current_user:
+            user_accounts = view_accounts(show_header, console, current_user)
+            add_transaction(show_header, console, current_user, user_accounts, categories)
+        elif choice == "3" and current_user:
+            view_transactions(show_header, console, current_user)
+        elif choice == "4" and current_user:
+            user_accounts = view_accounts(show_header, console, current_user)
+            view_summary(show_header, console, current_user, user_accounts)
+        elif choice == "5" and current_user:
+            user_management_menu(show_header, console)
