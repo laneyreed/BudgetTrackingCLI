@@ -6,7 +6,6 @@ from rich.text import Text
 from rich import box
 from rich.align import Align
 from rich.table import Table
-from rich.prompt import Prompt
 
 
 # ============================================
@@ -119,6 +118,9 @@ def update_layout(layout, main_content="Budget Tracker Content"):
 # Main Function
 #===========================================================
 def main():
+    """
+    Main Application Starter
+    """
     main_layout = create_layout()
     update_layout(main_layout)
     console.print(main_layout)

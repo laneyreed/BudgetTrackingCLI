@@ -1,4 +1,4 @@
-from ui.login import main
+from ui.main_cli import main
 
 if __name__ == "__main__":
     main()
