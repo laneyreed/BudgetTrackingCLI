@@ -1,140 +1,136 @@
 from rich.console import Console
+from rich.theme import Theme
+from rich.layout import Layout
+from rich.panel import Panel
 from rich.text import Text
 from rich import box
-from rich.table import Table
-from rich.prompt import Prompt
-from rich.panel import Panel
-from rich.theme import Theme
+from rich.align import Align
+
+from ui.menu import create_menu
+from ui.expenses import create_expense_table
+from ui.income import create_income_table
+from ui.month_overview import create_month_overview_table
+
+# only needed to run files directly from the ui/ directory
+# #========================================================================
+# try:
+#     # When running from parent directory (via main.py)
+#     from ui.menu import create_menu
+#     from ui.expenses import create_expense_table
+#     from ui.income import create_income_table
+#     from ui.month_overview import create_month_overview_table
+# except ImportError:
+#     # When running directly from ui directory
+#     from menu import create_menu
+#     from expenses import create_expense_table
+#     from income import create_income_table
+#     from month_overview import create_month_overview_table
+# #========================================================================
 
 
-from ui.users import user_management_menu, current_user
-from ui.accounts import manage_accounts_menu, view_accounts
-from CLI.ui.expenses import add_transaction, view_transactions, view_summary
-
-#===============================================================
-# UI Color Theme 
-#===============================================================
-PROMPT_COLOR = "YELLOW" 
-HEADER_COLOR = "#4c067a"
-MENU_OPTION_COLOR = "yellow"
-MENU_DESCRIPTION_COLOR = "green"
-
-# Custom theme for the CLI
-custom_theme = Theme({
-    "prompt.choices": PROMPT_COLOR,  
-    # "prompt.default": "bright_magenta",
-    "menu.option": MENU_OPTION_COLOR,
-    "menu.description": MENU_DESCRIPTION_COLOR,
-    "header": HEADER_COLOR,
-
+# ============================================
+# Theme Definition
+# ============================================
+budget_theme = Theme({
+    "header.text": "bold magenta",
+    "info": "green",
+    "text": "white",
+    "accent": "#4c067a",
+    "attention": "yellow",
 })
-#===============================================================
 
-#===============================================================
-# Choices for menus
-#===============================================================
-LOGGED_OUT_CHOICES = ["0", "1"]
-LOGGED_IN_CHOICES = ["0", "1", "2", "3", "4", "5"]
-#===============================================================
+console = Console(theme=budget_theme)
+layout = Layout()
 
-#===============================================================
-# Initialize Rich console with custom theme
-#===============================================================
-console = Console(theme=custom_theme)
-
-
-#=================================================================================
-# Helper Functions
-#=================================================================================
-def keyboardInterruptMessage():
-    """Displays a keyboard interrupt message."""
-    console.print("\n\n[yellow]Application interrupted. Goodbye! 👋[/yellow]")
-
-def otherErrorMessage(e):
-    """Displays an error message for unexpected exceptions."""
-    console.print(f"\n[red]An error occurred: {e}[/red]")
-
-def loggedOut(menu):
-    """Menu options for logged out users."""
-    menu.add_row("1", "Create/Select User")
-    menu.add_row("0", "Exit")
-
-def loggedIn(menu):
-    """Menu options for logged in users."""
-
-    menu.add_row("1", "Manage Accounts")
-    menu.add_row("2", "Add Transaction")
-    menu.add_row("3", "View Transactions")
-    menu.add_row("4", "View Summary")
-    menu.add_row("5", "Switch User")
-    menu.add_row("0", "Exit")
-
-def createMenu():
-    """Creates and returns a menu table."""
-
-    menu_table = Table(show_header=False, box=box.SIMPLE, padding=(0, 2))
-    menu_table.add_column("Option", style=MENU_OPTION_COLOR, justify="right")
-    menu_table.add_column("Description", style=MENU_DESCRIPTION_COLOR)
-    return menu_table
+#===========================================================
+# Header
+#===========================================================
+def create_header():
+    """
+    Creates Header Area
+    """
+    header_text = Text("💸 WELCOME TO BUDGET TRACKER CLI 💸", style="header.text", justify="center")
+    header = Panel(header_text, box=box.DOUBLE, border_style="accent")
+    return header
 
 
+#===========================================================
+# Main Content
+#===========================================================
+def create_main_content():
+    """
+    Creates Main Content Area
+    """
+
+    expense_table = create_expense_table()
+    income_table = create_income_table()
+    
+    # Create a layout to hold both panels
+    content_layout = Layout()
+    content_layout.split_row(
+        Layout(name="income"),
+        Layout(name="expense")
+    )
+    
+    main_income_content = income_table
+    
+    main_expense_content = expense_table
+    
+    content_layout["income"].update(main_income_content)
+    content_layout["expense"].update(main_expense_content)
+    
+    return content_layout
 
 
-def show_header(console):
-    """Displays CLI Header"""
+#===========================================================
+# Layout
+#===========================================================
+def create_layout():
+    """
+    Creates Layout
+    """
+    layout = Layout()
+    
+    # Main split: header, body, footer
+    layout.split(
+        Layout(name="header", size=5),
+        Layout(name="body", size=16),
+        Layout(name="footer", size=16)
+    )
+    
+    # Split body into sidebar and main content
+    layout["body"].split_row(
+        Layout(name="sidebar", size=55),
+        Layout(name="main", ratio=1)
+    )
+    return layout
 
-    console.clear()
-    header_text = Text("💰 BUDGET TRACKER 💰", justify="center")
-    console.print(Panel(header_text, box=box.DOUBLE))
-    if current_user:
-        console.print(f"[green]Logged in as:[/green] [bold]{current_user.name}[/bold] ({current_user.email})\n")
-#===========================================================================
+
+#===========================================================
+# Update Layout
+#===========================================================
+def update_layout(layout):
+    """
+    Add Content to Layout 
+    """
+
+    # main_content = create_transaction_table()
+    layout["header"].update(create_header())
+    layout["sidebar"].update(create_menu())
+    layout["main"].update(create_main_content())
+    layout["footer"].update(create_month_overview_table())
+#===========================================================
 
 
-#==========================================================================
-# Main Menu Function
-#==========================================================================
-def main_menu(categories):
-    """Display the main menu and handle user input."""
+def main():
+    """
+    Test Layout Rendering
+    """
+    main_layout = create_layout()
+    update_layout(main_layout)
+    console.print(main_layout)
 
-    current_user = None
 
+if __name__ == "__main__":
+    main()
 
-    while True:
-        show_header(console)
-        
-        menu = createMenu()
-        
-        if not current_user:
-            loggedOut(menu)
-        else:
-            loggedIn(menu)
-
-        console.print(Panel(menu, title="[bold]Main Menu[/bold]", border_style="yellow"))
-
-        choice = Prompt.ask(
-            "\n[green]Select an option[/green]",
-            choices=LOGGED_IN_CHOICES if current_user else LOGGED_OUT_CHOICES,
-            default=None,
-            show_choices=True,
-            console=console
-        )
-
-        if choice == "0":
-            console.print("\n[green]Thank you for using Budget Tracker! Goodbye! 👋[/green]")
-            break
-        elif choice == "1":
-            if current_user:
-                manage_accounts_menu(show_header, console, current_user)
-            else:
-                current_user = user_management_menu(show_header, console)
-        elif choice == "2" and current_user:
-            user_accounts = view_accounts(show_header, console, current_user)
-            add_transaction(show_header, console, current_user, user_accounts, categories)
-        elif choice == "3" and current_user:
-            view_transactions(show_header, console, current_user)
-        elif choice == "4" and current_user:
-            user_accounts = view_accounts(show_header, console, current_user)
-            view_summary(show_header, console, current_user, user_accounts)
-        elif choice == "5" and current_user:
-            user_management_menu(show_header, console)
