@@ -43,18 +43,18 @@ def create_sidebar():
     """
     menu_table = Table(
         show_header=True,
-        header_style="accent",
+        header_style="bright",
         box=box.ROUNDED,
         border_style="attention",
         show_lines=True,
     )
     menu_table.add_column("[bold]Option[/bold]", style="info", justify="center", width=8)
-    menu_table.add_column("[bold]Action[/bold]", style="info")
+    menu_table.add_column("[bold]Action[/bold]", style="info", justify="center")
     
-    menu_table.add_row("1", "Action")
-    menu_table.add_row("2", "Action")
-    menu_table.add_row("3", "Action")
-    menu_table.add_row("4", "Action")
+    menu_table.add_row("1", "Add Transaction")
+    menu_table.add_row("2", "View Transactions")
+    menu_table.add_row("3", "Add Account")
+    menu_table.add_row("4", "View Accounts")
     menu_table.add_row("0", "Exit")
     
     centered_table = Align.center(menu_table)
@@ -90,13 +90,13 @@ def create_layout():
     # Main split: header, body, footer
     layout.split(
         Layout(name="header", size=5),
-        Layout(name="body", size=15),
+        Layout(name="body", size=16),
         Layout(name="footer", size=3)
     )
     
     # Split body into sidebar and main content
     layout["body"].split_row(
-        Layout(name="sidebar", size=35),
+        Layout(name="sidebar", size=55),
         Layout(name="main", ratio=1)
     )
     return layout
