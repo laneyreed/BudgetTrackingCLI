@@ -1,68 +1,127 @@
 from rich.console import Console
+from rich.theme import Theme
 from rich.layout import Layout
 from rich.panel import Panel
 from rich.text import Text
 from rich import box
 from rich.align import Align
 from rich.table import Table
+from rich.prompt import Prompt
 
-console = Console()
+
+# ============================================
+# Theme Definition
+# ============================================
+budget_theme = Theme({
+    "header.text": "bold magenta",
+    "info": "green",
+    "text": "white",
+    "accent": "#4c067a",
+    "attention": "yellow",
+})
+
+console = Console(theme=budget_theme)
 layout = Layout()
 
+#===========================================================
+# Header
+#===========================================================
+def create_header():
+    """
+    Creates Header Area
+    """
+    header_text = Text("💸 WELCOME TO BUDGET TRACKER CLI 💸", style="header.text", justify="center")
+    header = Panel(header_text, box=box.DOUBLE, border_style="accent")
+    return header
+
+
+#===========================================================
+# Sidebar Menu
+#===========================================================
+def create_sidebar():
+    """
+    Creates Sidebar Menu Area
+    """
+    menu_table = Table(
+        show_header=True,
+        header_style="accent",
+        box=box.ROUNDED,
+        border_style="attention",
+        show_lines=True,
+    )
+    menu_table.add_column("[bold]Option[/bold]", style="info", justify="center", width=8)
+    menu_table.add_column("[bold]Action[/bold]", style="info")
+    
+    menu_table.add_row("1", "Action")
+    menu_table.add_row("2", "Action")
+    menu_table.add_row("3", "Action")
+    menu_table.add_row("4", "Action")
+    menu_table.add_row("0", "Exit")
+    
+    centered_table = Align.center(menu_table)
+
+    return Panel(centered_table, title="[bold]MENU[/bold]", border_style="attention",  box=box.DOUBLE)
+
+#===========================================================
+# Main Content
+#===========================================================
+def create_main_content(content_text="Budget Tracker Content"):
+    """
+    Creates Main Content Area
+    """
+    content = Text(content_text, justify="center", style="text")
+    main_content = Panel(
+        Align.center(content, vertical="middle"),
+        border_style="info",
+        box=box.ROUNDED,
+        title="[bold]Budget[/bold]"
+    )
+    return main_content
+
+
+#===========================================================
+# Layout
+#===========================================================
 def create_layout():
-    #===============================================================
-    # Define the overall layout structure
-    #===============================================================
+    """
+    Creates Layout
+    """
+    layout = Layout()
+    
+    # Main split: header, body, footer
     layout.split(
-        Layout(name="header", size=3),
-        Layout(ratio=1, name="main"),
-        Layout(size=10, name="footer"),
+        Layout(name="header", size=5),
+        Layout(name="body", size=15),
+        Layout(name="footer", size=3)
     )
-
-    layout["main"].split_row(Layout(name="side_menu"), Layout(name="body", ratio=3))
-
-    #================================================================
-    # Appplication Header   
-    #================================================================
-    header_text = Text("💰 WELCOME TO BUDGET TRACKER CLI 💰", justify="center")
-    header = Panel(header_text, box=box.DOUBLE)
-    layout["header"].update(header)
-
-
-def update_body():
-    layout["body"].update(
-        Align.center(
-            Text(
-                """This is a demonstration of rich.Layout\n\nHit Ctrl+C to exit""",
-                justify="left",
-            ),
-
-        )
+    
+    # Split body into sidebar and main content
+    layout["body"].split_row(
+        Layout(name="sidebar", size=35),
+        Layout(name="main", ratio=1)
     )
+    return layout
 
 
-def create_menu_table():
-    menu_table = Table( title="MENU", show_lines=True)
-    menu_table.add_column("Description")
-    menu_table.add_column("Option")
-    return menu_table
+#===========================================================
+# Update Layout
+#===========================================================
+def update_layout(layout, main_content="Budget Tracker Content"):
+    """
+    Add Content to Layout 
+    """
+    layout["header"].update(create_header())
+    layout["sidebar"].update(create_sidebar())
+    layout["main"].update(create_main_content(main_content))
 
 
-def update_menu():
-    #================================================================
-    # USER MENU SECTION
-    #================================================================
-    menu = create_menu_table()
-    menu.add_row("EXISTING USER", "1")
-    menu.add_row("NEW USER", "2")
-    layout["side_menu"].update(menu)
-
-
+#===========================================================
+# Main Function
+#===========================================================
 def main():
-    create_layout()
-    update_body()
-    update_menu()
-    console.print(layout)
+    main_layout = create_layout()
+    update_layout(main_layout)
+    console.print(main_layout)
 
 main()
 
