@@ -1,54 +1,69 @@
 from rich.console import Console
+from rich.layout import Layout
+from rich.panel import Panel
 from rich.text import Text
 from rich import box
-from rich.panel import Panel
+from rich.align import Align
+from rich.table import Table
 
-def printHeader():
-    console = Console()
-    # header_text = Text("💰 BUDGET TRACKER 💰", justify="center")
-    # console.print(Panel(header_text, box=box.DOUBLE))
-    console.print("\n[header]Welcome to the Application CLI![/header]\n", justify="center")
+console = Console()
+layout = Layout()
 
-#================================================================
-# Are you a new user or existing user?
-# new user = login
-# existing user = register
-#================================================================
+def create_layout():
+    #===============================================================
+    # Define the overall layout structure
+    #===============================================================
+    layout.split(
+        Layout(name="header", size=3),
+        Layout(ratio=1, name="main"),
+        Layout(size=10, name="footer"),
+    )
 
-#================================================================
-# Generic login function
-#================================================================
-def login():
-    # for now create a generic login flow
-    username = input("Enter your username: ")
-    password = input("Enter your password: ")
-    print(f"Logging in as: {username}")
+    layout["main"].split_row(Layout(name="side_menu"), Layout(name="body", ratio=3))
+
+    #================================================================
+    # Appplication Header   
+    #================================================================
+    header_text = Text("💰 WELCOME TO BUDGET TRACKER CLI 💰", justify="center")
+    header = Panel(header_text, box=box.DOUBLE)
+    layout["header"].update(header)
 
 
+def update_body():
+    layout["body"].update(
+        Align.center(
+            Text(
+                """This is a demonstration of rich.Layout\n\nHit Ctrl+C to exit""",
+                justify="left",
+            ),
 
-#================================================================
-# Generic register function
-#================================================================
-def register():    # for now create a generic register flow
-    username = input("Choose a username: ")
-    password = input("Choose a password: ")
-    print(f"Registering new user: {username}.....")
-    login()
+        )
+    )
 
-def loginOrRegister():
-    while True:
-        choice = input("Enter 1 to login or 2 to register: ")
-        if choice == "1":
-            login()
-            break
-        elif choice == "2":
-            register()
-            break
-        else:
-            print("Invalid choice. Please enter 1 or 2.")
+
+def create_menu_table():
+    menu_table = Table( title="MENU", show_lines=True)
+    menu_table.add_column("Description")
+    menu_table.add_column("Option")
+    return menu_table
+
+
+def update_menu():
+    #================================================================
+    # USER MENU SECTION
+    #================================================================
+    menu = create_menu_table()
+    menu.add_row("EXISTING USER", "1")
+    menu.add_row("NEW USER", "2")
+    layout["side_menu"].update(menu)
+
 
 def main():
-    while True:
-        printHeader()
-        loginOrRegister()
-        break
+    create_layout()
+    update_body()
+    update_menu()
+    console.print(layout)
+
+main()
+
+
