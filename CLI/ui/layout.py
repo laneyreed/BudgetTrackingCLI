@@ -5,9 +5,9 @@ from rich.panel import Panel
 from rich.text import Text
 from rich import box
 from rich.align import Align
-from rich.table import Table
 
-
+from ui.menu import create_menu
+from ui.transactions import create_transaction_table
 # ============================================
 # Theme Definition
 # ============================================
@@ -34,43 +34,45 @@ def create_header():
     return header
 
 
-#===========================================================
-# Sidebar Menu
-#===========================================================
-def create_sidebar():
-    """
-    Creates Sidebar Menu Area
-    """
-    menu_table = Table(
-        show_header=True,
-        header_style="bright",
-        box=box.ROUNDED,
-        border_style="attention",
-        show_lines=True,
-    )
-    menu_table.add_column("[bold]Option[/bold]", style="info", justify="center", width=8)
-    menu_table.add_column("[bold]Action[/bold]", style="info", justify="center")
+# #===========================================================
+# # Sidebar Menu
+# #===========================================================
+# def create_sidebar():
+#     """
+#     Creates Sidebar Menu Area
+#     """
+#     menu_table = Table(
+#         show_header=True,
+#         header_style="bright",
+#         box=box.ROUNDED,
+#         border_style="attention",
+#         show_lines=True,
+#     )
+#     menu_table.add_column("[bold]Option[/bold]", style="info", justify="center", width=8)
+#     menu_table.add_column("[bold]Action[/bold]", style="info", justify="center")
     
-    menu_table.add_row("1", "Add Transaction")
-    menu_table.add_row("2", "View Transactions")
-    menu_table.add_row("3", "Add Account")
-    menu_table.add_row("4", "View Accounts")
-    menu_table.add_row("0", "Exit")
+#     menu_table.add_row("1", "Add Transaction")
+#     menu_table.add_row("2", "View Transactions")
+#     menu_table.add_row("3", "Add Account")
+#     menu_table.add_row("4", "View Accounts")
+#     menu_table.add_row("0", "Exit")
     
-    centered_table = Align.center(menu_table)
+#     centered_table = Align.center(menu_table)
 
-    return Panel(centered_table, title="[bold]MENU[/bold]", border_style="attention",  box=box.DOUBLE)
+#     return Panel(centered_table, title="[bold]MENU[/bold]", border_style="attention",  box=box.DOUBLE)
 
 #===========================================================
 # Main Content
 #===========================================================
-def create_main_content(content_text="Budget Tracker Content"):
+def create_main_content():
     """
     Creates Main Content Area
     """
-    content = Text(content_text, justify="center", style="text")
+
+    transaction_table = create_transaction_table()
+    content = Text("Budget Tracker Content", justify="center", style="text")
     main_content = Panel(
-        Align.center(content, vertical="middle"),
+        Align.center(transaction_table, vertical="middle"),
         border_style="info",
         box=box.ROUNDED,
         title="[bold]Budget[/bold]"
@@ -105,26 +107,15 @@ def create_layout():
 #===========================================================
 # Update Layout
 #===========================================================
-def update_layout(layout, main_content="Budget Tracker Content"):
+def update_layout(layout):
     """
     Add Content to Layout 
     """
+
+    # main_content = create_transaction_table()
     layout["header"].update(create_header())
-    layout["sidebar"].update(create_sidebar())
-    layout["main"].update(create_main_content(main_content))
-
-
+    layout["sidebar"].update(create_menu())
+    layout["main"].update(create_main_content())
 #===========================================================
-# Main Function
-#===========================================================
-def main():
-    """
-    Main Application Starter
-    """
-    main_layout = create_layout()
-    update_layout(main_layout)
-    console.print(main_layout)
-
-main()
 
 
